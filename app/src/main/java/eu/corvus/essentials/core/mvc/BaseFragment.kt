@@ -6,8 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import com.flirtsy.app.core.mvc.BaseController
-import com.flirtsy.app.core.mvc.ModelView
 
 /**
  * Created by Vlad Cazacu on 17.03.2017.

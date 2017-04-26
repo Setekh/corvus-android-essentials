@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-
+apply plugin: 'kotlin-android'
 apply plugin: 'maven-publish'
 
 android {
@@ -17,6 +17,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    lintOptions {
+        abortOnError false
     }
 }
 
@@ -39,7 +42,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.0'
 
     // Kotlin
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile 'org.jetbrains.anko:anko-sdk15:0.9.1' // sdk19, sdk21, sdk23 are also available
 }
 
@@ -61,14 +64,16 @@ publishing {
 
             pom.withXml {
                 def dependenciesNode = asNode().appendNode('dependencies')
-                configurations.compile.allDependencies.each {
-                    if(it.group.contains("com.android.support"))
-                        return
+                configurations.compile.allDependencies.each { dp ->
+                    if (dp instanceof ModuleDependency) {
+//                        if (dp.group.contains("com.android.support"))
+//                            return
 
-                    def dependencyNode = dependenciesNode.appendNode('dependency')
-                    dependencyNode.appendNode('groupId', it.group)
-                    dependencyNode.appendNode('artifactId', it.name)
-                    dependencyNode.appendNode('version', it.version)
+                        def dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('groupId', dp.group)
+                        dependencyNode.appendNode('artifactId', dp.name)
+                        dependencyNode.appendNode('version', dp.version)
+                    }
                 }
             }
         }
@@ -77,11 +82,13 @@ publishing {
     repositories {
         maven {
             credentials {
-                println "Publishing with user ${System.getenv('bintray_user')}"
-                username = System.getenv('bintray_user')
-                password = System.getenv('bintray_key')
+                def userName = System.getenv('bintray_user')
+                def apiKey = System.getenv('bintray_key')
+                println "Publishing with user ${userName}"
+                username = userName
+                password = apiKey
             }
-            url "https://api.bintray.com/maven/whitesoftwaresrl/android/android_essentials/;publish=1"
+            url "https://api.bintray.com/maven/setekh/corvus_corax/android_essentials/;publish=1"
         }
     }
 }

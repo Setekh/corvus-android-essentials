@@ -2,7 +2,7 @@ package eu.corvus.essentials.core.mvc
 
 import android.content.Context
 import android.content.Intent
-import com.flirtsy.app.core.Dispatcher
+import eu.corvus.essentials.core.Dispatcher
 
 /**
  * Created by Vlad Cazacu on 17.03.2017.

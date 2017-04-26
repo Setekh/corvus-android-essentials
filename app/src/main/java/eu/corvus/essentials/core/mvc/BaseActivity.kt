@@ -4,10 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import com.flirtsy.app.core.ActivityResult
-import com.flirtsy.app.core.Dispatcher
-import com.flirtsy.app.core.RequestPermissionResult
-import com.flirtsy.app.core.debug
+import eu.corvus.essentials.core.ActivityResult
+import eu.corvus.essentials.core.Dispatcher
+import eu.corvus.essentials.core.RequestPermissionResult
+import eu.corvus.essentials.core.debug
 
 /**
  * Created by Vlad Cazacu on 10/4/2016.
