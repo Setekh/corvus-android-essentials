@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Build
+import android.os.Handler
 import android.text.TextUtils
 import android.util.Patterns
 import android.view.View
@@ -21,6 +22,8 @@ import com.squareup.picasso.Picasso
 import eu.corvus.essentials.core.mvc.BaseActivity
 import java.io.Serializable
 import java.io.StringWriter
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.ScheduledExecutorService
 import kotlin.properties.Delegates
 
 /**
@@ -29,6 +32,23 @@ import kotlin.properties.Delegates
 
 var appContext: BaseApplication by Delegates.notNull<BaseApplication>()
 var picasso: Picasso by Delegates.notNull<Picasso>()
+
+open class Threads(val executionService: ExecutorService, val scheduledExecutorService: ScheduledExecutorService, val uiHandler: Handler) {
+    fun terminate() {
+        try {
+            executionService.shutdownNow()
+        } catch (e: Exception) {
+            error("Failed shutting down exec service!", e)
+        }
+        try {
+            scheduledExecutorService.shutdownNow()
+        } catch (e: Exception) {
+            error("Failed shutting down scheduled exec service!", e)
+        }
+    }
+}
+
+var threads: Threads by Delegates.notNull<Threads>()
 
 val gson = Gson()
 
@@ -90,6 +110,15 @@ inline fun <reified T : Any> List<Any>.exists(predicate: (T) -> Boolean) : Boole
 
 fun isEmailValid(email: String?): Boolean {
     return !(email == null || TextUtils.isEmpty(email)) && Patterns.EMAIL_ADDRESS.matcher(email).matches()
+}
+
+fun getNumberOfCores(): Int {
+    if(Build.VERSION.SDK_INT >= 17) {
+        return Runtime.getRuntime().availableProcessors()
+    }
+    else {
+        return 2 // FIXME assume 2
+    }
 }
 
 // Default Intent Actions

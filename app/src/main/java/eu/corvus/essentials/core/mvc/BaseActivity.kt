@@ -14,7 +14,7 @@ import eu.corvus.essentials.core.debug
  */
 abstract class BaseActivity : AppCompatActivity(), ModelView {
 
-    open val controller: BaseController<out ModelView>? = null
+    open val controller: BaseController<out BaseActivity>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +27,7 @@ abstract class BaseActivity : AppCompatActivity(), ModelView {
 
     override fun startActivityForResult(intent: Intent, requestCode: Int) {
         intent.putExtra("requestCode", requestCode)
+
         super.startActivityForResult(intent, requestCode)
     }
 

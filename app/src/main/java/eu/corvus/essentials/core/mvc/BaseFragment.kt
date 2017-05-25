@@ -2,10 +2,11 @@ package eu.corvus.essentials.core.mvc
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
+import android.widget.TextView
 
 /**
  * Created by Vlad Cazacu on 17.03.2017.
@@ -19,7 +20,11 @@ abstract class BaseFragment : Fragment(), ModelView {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         if(viewId == 0)
-            rootView = FrameLayout(context)
+            rootView = TextView(context).apply {
+                layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                gravity = Gravity.CENTER
+                text = "View not setup"
+            }
         else
             rootView = inflater.inflate(viewId, container, false)
 

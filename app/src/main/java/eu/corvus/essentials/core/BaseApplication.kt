@@ -4,11 +4,14 @@ import android.app.Activity
 import android.app.Application
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import com.squareup.picasso.Picasso
 import eu.corvus.essentials.core.utils.OkHttp3Downloader
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.error
 import timber.log.Timber
+import java.util.concurrent.Executors
 
 /**
  * Created by Vlad Cazacu on 10/4/2016.
@@ -23,6 +26,7 @@ abstract class BaseApplication : Application(), Application.ActivityLifecycleCal
         super.onCreate()
 
         appContext = this
+        threads = provideThreads()
         picasso = providePicasso()
         Picasso.setSingletonInstance(picasso)
 
@@ -34,6 +38,13 @@ abstract class BaseApplication : Application(), Application.ActivityLifecycleCal
 
         configureTimber()
         initialize()
+    }
+
+    private fun provideThreads(): Threads {
+        val execService = Executors.newFixedThreadPool(getNumberOfCores())
+        val scheduleService = Executors.newScheduledThreadPool(getNumberOfCores())
+
+        return Threads(execService, scheduleService, Handler(Looper.getMainLooper()))
     }
 
     /**
@@ -120,4 +131,9 @@ abstract class BaseApplication : Application(), Application.ActivityLifecycleCal
 
     enum class ActivityState { Active, Paused, Stopped, Created, Destroyed }
     data class ActivityInfo(val type: Class<out Activity>, var activity: Activity, var activityState: ActivityState)
+
+    override fun onTerminate() {
+        super.onTerminate()
+        threads.terminate()
+    }
 }
