@@ -3,6 +3,9 @@ package eu.corvus.essentials.core
 import java.util.*
 import java.util.concurrent.Callable
 import java.util.concurrent.Future
+import java.util.concurrent.FutureTask
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.locks.ReentrantLock
 
 /**
  * Created by Vlad Cazacu on 05.05.2017.
@@ -64,12 +67,9 @@ class Promise<T> {
     }
 
     fun get(): T  {
+
         if(isCanceled)
             throw InterruptedException("Task interrupted!")
-
-        while (future == null) {
-            Thread.sleep(100)
-        }
 
         return future!!.get() as T
     }
@@ -78,22 +78,24 @@ class Promise<T> {
 fun <V> task(body: () -> V): Promise<V> {
     val promise = Promise<V>()
 
+    val futureTask = FutureTask<V>(Callable {
+        var value: V? = null
+        try {
+            val v = body.invoke()
+            value = v
+            promise.doSuccess(v)
+        } catch (e: Exception) {
+            promise.doFail(e)
+        } finally {
+            promise.doFinally()
+        }
+        value
+    })
+
+    promise.future = futureTask
+
     threads.uiHandler.post { // on the next loop
-        promise.future = threads.executionService.submit(Callable {
-            var value: V? = null
-            try {
-                val v = body.invoke()
-                value = v
-                promise.doSuccess(v)
-            } catch (e: Exception) {
-                promise.doFail(e)
-            } finally {
-                promise.doFinally()
-            }
-
-            value
-        })
-
+        threads.executionService.submit(futureTask)
     }
 
     return promise
