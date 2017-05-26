@@ -1,6 +1,7 @@
 package eu.corvus.essentials.core
 
 import java.util.*
+import java.util.concurrent.Callable
 import java.util.concurrent.Future
 
 /**
@@ -50,15 +51,16 @@ class Promise<T> {
     class ResultCallbackHolder<in E>(val isUi: Boolean, val resultHandler: (Boolean, E) -> Unit)
 
     fun doFinally() {
+        successHandlers.clear()
+        failHandlers.clear()
         val alwaysHandler = alwaysHandler ?: return
+
+        this.alwaysHandler = null
 
         if(alwaysHandler.isUi)
             threads.uiHandler.post { alwaysHandler.resultHandler.invoke(isSuccessful, Unit) }
         else
             alwaysHandler.resultHandler.invoke(isSuccessful, Unit)
-
-        successHandlers.clear()
-        failHandlers.clear()
     }
 
     fun get(): T  {
@@ -77,16 +79,21 @@ fun <V> task(body: () -> V): Promise<V> {
     val promise = Promise<V>()
 
     threads.uiHandler.post { // on the next loop
-        promise.future = threads.executionService.submit {
+        promise.future = threads.executionService.submit(Callable {
+            var value: V? = null
             try {
                 val v = body.invoke()
+                value = v
                 promise.doSuccess(v)
             } catch (e: Exception) {
                 promise.doFail(e)
             } finally {
                 promise.doFinally()
             }
-        }
+
+            value
+        })
+
     }
 
     return promise
