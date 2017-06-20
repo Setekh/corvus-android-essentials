@@ -4,7 +4,7 @@ apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "25.0.3"
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 25
@@ -35,7 +35,6 @@ dependencies {
     // -- Android Support Libs
 
     // Square
-    compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.squareup.okhttp3:okhttp:3.7.0'
 
     compile 'com.jakewharton.timber:timber:4.5.1'
@@ -54,7 +53,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'eu.corvus.essentials'
             artifactId 'corvus-essentials'
-            version '0.2.3'
+            version '0.2.6'
 
             artifact getReleaseArtifact()
 

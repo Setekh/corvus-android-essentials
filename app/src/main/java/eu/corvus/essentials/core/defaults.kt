@@ -18,7 +18,6 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.stream.JsonWriter
-import com.squareup.picasso.Picasso
 import eu.corvus.essentials.core.mvc.BaseActivity
 import java.io.Serializable
 import java.io.StringWriter
@@ -31,8 +30,10 @@ import kotlin.properties.Delegates
  */
 
 var appContext: BaseApplication by Delegates.notNull<BaseApplication>()
-var picasso: Picasso by Delegates.notNull<Picasso>()
 
+val gson by lazy { Gson() }
+
+var threads: Threads by Delegates.notNull<Threads>()
 open class Threads(val executionService: ExecutorService, val scheduledExecutorService: ScheduledExecutorService, val uiHandler: Handler) {
     fun terminate() {
         try {
@@ -48,16 +49,10 @@ open class Threads(val executionService: ExecutorService, val scheduledExecutorS
     }
 }
 
-var threads: Threads by Delegates.notNull<Threads>()
-
-val gson = Gson()
-
 fun JsonArray.addAll(filter: Iterable<JsonElement>) = filter.forEach { add(it) }
-
 fun Any.toJson(): JsonElement = gson.toJsonTree(this)
 
 inline fun <reified T: Any> JsonObject.fromJson(): T = gson.fromJson(this, T::class.java)
-//inline fun <reified T: Any> JsonArray.fromJson(): ArrayList<T> = gson.fromJson<ArrayList<T>>(this, genericType<ArrayList<T>>())
 
 fun JsonElement.prettyPrint(stringWriter: StringWriter = StringWriter()): String {
     val jsonWriter = JsonWriter(stringWriter)

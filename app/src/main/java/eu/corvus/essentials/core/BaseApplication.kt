@@ -6,10 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import com.squareup.picasso.Picasso
-import eu.corvus.essentials.core.utils.OkHttp3Downloader
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.error
 import timber.log.Timber
 import java.util.concurrent.Executors
 
@@ -27,8 +24,6 @@ abstract class BaseApplication : Application(), Application.ActivityLifecycleCal
 
         appContext = this
         threads = provideThreads()
-        picasso = providePicasso()
-        Picasso.setSingletonInstance(picasso)
 
         registerActivityLifecycleCallbacks(this)
 
@@ -52,10 +47,6 @@ abstract class BaseApplication : Application(), Application.ActivityLifecycleCal
      */
     fun configureTimber() {
         Timber.plant(Timber.DebugTree())
-    }
-
-    open fun providePicasso(): Picasso {
-        return Picasso.Builder(this).downloader(OkHttp3Downloader(this, Long.MAX_VALUE)).listener { picasso, uri, exception -> error("Picasso failed loading[$uri]!", exception) }.build()
     }
 
     abstract fun initialize() // initialize
